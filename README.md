@@ -63,6 +63,9 @@ pip install pymongo
 ## 4. 프로젝트 폴더 구성
 
 공유받은 파일들을 아래 구조로 정리해주세요.
+- 이 레포지토리를 다운받으시면 경로가 자동 설정됩니다.
+- DE_prj1 파일을 바탕화면에 둬주세요.
+- 처음 실행 전 VSC 터미널에서 cd "경로\"바탕 화면"\DE_prj1"를 통해 파일내로 이동합니다.
 
 ```
 DE_prj1/
@@ -70,7 +73,7 @@ DE_prj1/
 └── output/                 ← CSV 파일 저장 폴더 (없으면 자동 생성)
     ├── wegovy_2022.csv
     ├── wegovy_2023.csv
-    ├── ...                 ← 공유받은 기존 CSV 파일들
+    ├── ...                 ← 공유받은 기존 CSV 파일들 
     └── mounjaro_2026.csv
 ```
 
@@ -95,9 +98,10 @@ Cloudflare 차단을 우회하기 위해 브라우저 쿠키를 직접 사용합
 
 ---
 
-## 6. twscrape 버그 수정 (최초 1회)
+## 6. twscrape 버그 수정
 
-twscrape의 JS 파싱 버그를 수동으로 패치해야 합니다. **최초 1회만** 하면 됩니다.
+twscrape의 JS 파싱 버그를 수동으로 패치해야 합니다.
+- ‼️‼️‼️js 파싱 값은 일회성(주기적으로 바뀜)이므로 데이터 수집이 안될때마다 제일 먼저 이 버그를 의심하셔야 합니다!
 
 ### 6-1. xclid.py 파일 위치 찾기
 
@@ -109,11 +113,7 @@ python -c "import twscrape; import os; print(os.path.dirname(twscrape.__file__))
 
 ### 6-2. 최신 JS 파일명 찾기
 
-Chrome에서 `x.com` 접속 후 **Console 탭** (`F12`)에서 실행:
-
-```javascript
-performance.getEntriesByType("resource").filter(r => r.name.includes("ondemand.s")).map(r => r.name)
-```
+Chrome에서 `x.com` 접속 후 **Network 탭** (`F12`)에서 `ondemand.s` 검색 후 새로고침(f5):
 
 결과로 나오는 `ondemand.s.xxxxxxxx.js` 형태의 파일명을 복사합니다.
 
@@ -123,10 +123,11 @@ performance.getEntriesByType("resource").filter(r => r.name.includes("ondemand.s
 
 ```powershell
 $file = "C:\위에서_나온_경로\twscrape\xclid.py"
-(Get-Content $file -Raw) -replace 'ondemand\.s\.[a-f0-9]+\.js', 'ondemand.s.여기에_실제파일명.js' | Set-Content $file
+(Get-Content $file -Raw) -replace 'ondemand\.s\.[a-f0-9]+\.js', 'ondemand.s.‼️여기에_실제파일명.js' | Set-Content $file
 ```
 
 적용 확인:
+- 출력창에 위에서 입력한 xxxxxxxx값이 있는지 확인
 ```powershell
 Select-String -Path $file -Pattern "ondemand"
 ```
@@ -150,8 +151,6 @@ X_EMAIL_PASSWORD = "본인_구글_비밀번호"
 AUTH_TOKEN = "복사한_auth_token_값"
 CT0_TOKEN  = "복사한_ct0_값"
 ```
-
-> 🔒 **보안 주의**: 코드를 GitHub에 올릴 때 위 값들을 반드시 삭제하거나 빈 문자열로 바꾸세요.
 
 ---
 
@@ -242,6 +241,7 @@ python scrape_tweets.py
 ---
 
 ## 11. 자주 발생하는 문제
+- 에러발생 코드를 카톡으로 알려주시면 답변드릴 수 있는 문제는 답변드리고 같이 해결하도록 노력해보겠습니다!
 
 | 증상 | 원인 | 해결 방법 |
 |------|------|-----------|
@@ -250,7 +250,7 @@ python scrape_tweets.py
 | `No active accounts` | 계정 DB 오류 | `Remove-Item accounts.db` 후 재실행하세요 |
 | `No account available... Next available at` | Rate limit (정상) | 그냥 두면 자동으로 재개됩니다 |
 | `ModuleNotFoundError: twscrape` | 라이브러리 미설치 | `pip install twscrape` 실행하세요 |
-| `Account already exists` (경고) | 정상 동작 | 무시해도 됩니다 |
+| `Account already exists` (경고) | 정상 동작 | 무시해도 됩니다 > Remove acccount.db를 실행하시면 없어짐. |
 
 ---
 
@@ -262,21 +262,3 @@ python scrape_tweets.py
 - **쿠키 값 비공유**: `AUTH_TOKEN`, `CT0_TOKEN`은 개인 정보입니다. GitHub push 전 반드시 삭제하세요.
 - **중복 걱정 없음**: 기존 CSV의 ID를 자동으로 로드하므로 여러 번 돌려도 중복 없이 저장됩니다.
 
-### .gitignore 추천 설정
-
-```gitignore
-# 계정 DB
-accounts.db
-
-# 수집 데이터 (용량 크면 제외)
-output/
-
-# Python
-__pycache__/
-*.pyc
-.env
-```
-
----
-
-*문의사항은 팀 채널에 남겨주세요* 🙌
