@@ -11,7 +11,7 @@
 3. [라이브러리 설치](#3-라이브러리-설치)
 4. [프로젝트 폴더 구성](#4-프로젝트-폴더-구성)
 5. [X(Twitter) 쿠키 추출](#5-xtwitter-쿠키-추출)
-6. [twscrape 버그 수정](#6-twscrape-버그-수정-최초-1회)
+6. [twscrape 버그 수정 (필수)](#6-twscrape-버그-수정-필수--최초-1회)
 7. [코드에 계정 정보 입력](#7-코드에-계정-정보-입력)
 8. [스크립트 실행](#8-스크립트-실행)
 9. [시작 위치 선택](#9-시작-위치-선택)
@@ -24,14 +24,14 @@
 ## 1. 사전 준비
 
 ### 필요한 계정
-- **X(Twitter) 계정** — 스크래핑에 사용할 계정
+- **X(Twitter) 계정** — 스크래핑에 사용할 계정 (개인 계정 사용 시 정지될 수 있으니 별도 계정 권장)
 - **Gmail 계정** — X 계정에 연동된 이메일
 
-> ⚠️ **주의**: 본인 개인 계정 사용 시 스크래핑 감지로 일시 제한될 수 있습니다. 가능하면 별도 계정을 만들어 사용하세요.
+> ⚠️ **계정 정지 주의**: 스크래핑 감지로 계정이 정지되면 `IndexError: list index out of range` 오류가 납니다. x.com에 직접 로그인해서 검색이 정상적으로 되는지 확인하세요. 정지됐다면 새 계정으로 교체해야 합니다.
 
 ### 필요한 소프트웨어
 - Python 3.11 이상
-- VSCode (권장) 또는 다른 코드 에디터
+- VSCode (권장)
 - Google Chrome (쿠키 추출용)
 
 ---
@@ -63,9 +63,6 @@ pip install pymongo
 ## 4. 프로젝트 폴더 구성
 
 공유받은 파일들을 아래 구조로 정리해주세요.
-- 이 레포지토리를 다운받으시면 경로가 자동 설정됩니다.
-- DE_prj1 파일을 바탕화면에 둬주세요.
-- 처음 실행 전 VSC 터미널에서 cd "경로\"바탕 화면"\DE_prj1"를 통해 파일내로 이동합니다.
 
 ```
 DE_prj1/
@@ -73,7 +70,7 @@ DE_prj1/
 └── output/                 ← CSV 파일 저장 폴더 (없으면 자동 생성)
     ├── wegovy_2022.csv
     ├── wegovy_2023.csv
-    ├── ...                 ← 공유받은 기존 CSV 파일들 
+    ├── ...                 ← 공유받은 기존 CSV 파일들
     └── mounjaro_2026.csv
 ```
 
@@ -98,41 +95,63 @@ Cloudflare 차단을 우회하기 위해 브라우저 쿠키를 직접 사용합
 
 ---
 
-## 6. twscrape 버그 수정
+## 6. twscrape 버그 수정 (필수 / 최초 1회)
 
-twscrape의 JS 파싱 버그를 수동으로 패치해야 합니다.
-- ‼️‼️‼️js 파싱 값은 일회성(주기적으로 바뀜)이므로 데이터 수집이 안될때마다 제일 먼저 이 버그를 의심하셔야 합니다!
+twscrape가 x.com에 접근할 때 Cloudflare 차단으로 내부 JS 파일 URL을 자동으로 찾지 못합니다.
+**URL을 직접 하드코딩**해서 이 문제를 우회해야 합니다. **모든 팀원이 반드시 적용**해야 합니다.
 
-### 6-1. xclid.py 파일 위치 찾기
-
-```bash
-python -c "import twscrape; import os; print(os.path.dirname(twscrape.__file__))"
-```
-
-출력된 경로 + `\xclid.py` 가 수정할 파일입니다.
-
-### 6-2. 최신 JS 파일명 찾기
-
-Chrome에서 `x.com` 접속 후 **Network 탭** (`F12`)에서 `ondemand.s` 검색 후 새로고침(f5):
-
-결과로 나오는 `ondemand.s.xxxxxxxx.js` 형태의 파일명을 복사합니다.
-
-### 6-3. PowerShell에서 패치 적용
-
-아래 명령어의 경로와 파일명을 실제 값으로 바꿔서 실행:
+### 6-1. xclid.py 파일 열기
 
 ```powershell
-$file = "C:\위에서_나온_경로\twscrape\xclid.py"
-(Get-Content $file -Raw) -replace 'ondemand\.s\.[a-f0-9]+\.js', 'ondemand.s.‼️여기에_실제파일명.js' | Set-Content $file
+$file = python -c "import twscrape; import os; print(os.path.join(os.path.dirname(twscrape.__file__), 'xclid.py'))"
+code $file
 ```
 
-적용 확인:
-- 출력창에 위에서 입력한 xxxxxxxx값이 있는지 확인
-```powershell
-Select-String -Path $file -Pattern "ondemand"
+### 6-2. `parse_anim_idx` 함수 수정
+
+VSCode에서 `Ctrl+F` → `parse_anim_idx` 검색 후 아래 부분을 찾아서:
+
+**수정 전:**
+```python
+async def parse_anim_idx(text: str) -> list[int]:
+    scripts = list(get_scripts_list(text))
+    scripts = [x for x in scripts if "/ondemand.s." in x]
 ```
 
-> 🔄 **이후에도 0개 수집이 반복되면** JS 파일명이 바뀐 것입니다. 6-2 → 6-3을 다시 진행하세요.
+**수정 후:**
+```python
+async def parse_anim_idx(text: str) -> list[int]:
+    scripts = ["https://abs.twimg.com/responsive-web/client-web/ondemand.s.96a973da.js"]
+    scripts = [x for x in scripts if "/ondemand.s." in x]
+```
+
+`Ctrl+S` 로 저장합니다.
+
+### 6-3. get_scripts_list 함수도 패치
+
+같은 파일에서 `Ctrl+F` → `Failed to parse scripts` 검색 후 아래 부분을 찾아서:
+
+**수정 전:**
+```python
+    except json.decoder.JSONDecodeError as e:
+        raise Exception("Failed to parse scripts") from e
+```
+
+**수정 후:**
+```python
+    except json.decoder.JSONDecodeError as e:
+        try:
+            import re as _re
+            fixed = _re.sub(r'([,\{])(\s*)([\w$]+)(\s*):(?=\s*")', r'\1\2"\3"\4:', scripts)
+            for k, v in json.loads(fixed).items():
+                yield script_url(k, f"{v}a")
+        except Exception:
+            raise Exception("Failed to parse scripts") from e
+```
+
+`Ctrl+S` 로 저장합니다.
+
+> 🔄 **나중에 `IndexError`가 다시 발생하면** JS 파일명이 바뀐 것입니다. Chrome → x.com → F12 → Network 탭에서 `ondemand.s` 검색 후 최신 파일명으로 6-2를 다시 진행하세요.
 
 ---
 
@@ -151,6 +170,8 @@ X_EMAIL_PASSWORD = "본인_구글_비밀번호"
 AUTH_TOKEN = "복사한_auth_token_값"
 CT0_TOKEN  = "복사한_ct0_값"
 ```
+
+> 🔒 **보안 주의**: 코드를 GitHub에 올릴 때 위 값들을 반드시 빈 문자열로 바꾸세요.
 
 ---
 
@@ -241,17 +262,17 @@ python scrape_tweets.py
 ---
 
 ## 11. 자주 발생하는 문제
-- 에러발생 코드를 카톡으로 알려주시면 답변드릴 수 있는 문제는 답변드리고 같이 해결하도록 노력해보겠습니다!
 
 | 증상 | 원인 | 해결 방법 |
 |------|------|-----------|
-| 수집량이 모두 0개 | 쿠키 만료 | [5번](#5-xtwitter-쿠키-추출) 과정을 다시 진행해 새 쿠키를 입력하세요 |
-| `IndexError: list index out of range` | JS 파일명 변경 | [6번](#6-twscrape-버그-수정-최초-1회) 과정을 다시 진행하세요 |
-| `No active accounts` | 계정 DB 오류 | `Remove-Item accounts.db` 후 재실행하세요 |
-| `No account available... Next available at` | Rate limit (정상) | 그냥 두면 자동으로 재개됩니다 |
-| `ModuleNotFoundError: twscrape` | 라이브러리 미설치 | `pip install twscrape` 실행하세요 |
-| `Account already exists` (경고) | 정상 동작 | 무시해도 됩니다 > `Remove-Item accounts.db`를 실행하시면 없어짐. |
-|twscrape.accounts_pool:get_for_queue_or_wait:301(308) | 정상 동작 | 잘 동작되고 있는겁니다! 만약 csv 저장이 +0이 계속 뜬다면 그건 다른 오류입니다. 아마 `ondemand.s.js` 오류일 가능성이 큽니다. |
+| `IndexError: list index out of range` | ① 계정 정지 또는 ② xclid.py 미패치 | x.com 직접 로그인해서 계정 상태 확인 → 정지면 새 계정 교체. 정상이면 [6번](#6-twscrape-버그-수정-필수--최초-1회) 패치 적용 |
+| 수집량이 모두 0개 | 쿠키 만료 | [5번](#5-xtwitter-쿠키-추출) 과정 다시 진행해 새 쿠키 입력 |
+| `No active accounts` | 계정 DB 오류 | `Remove-Item accounts.db` 후 재실행 |
+| `No account available... Next available at` | Rate limit (정상) | 그냥 두면 자동 재개됩니다 |
+| `ModuleNotFoundError: twscrape` | 라이브러리 미설치 | `pip install twscrape` 실행 |
+| `Account already exists` (경고) | 정상 동작 | 무시해도 됩니다 |
+| `TabError: inconsistent use of tabs` | xclid.py 수정 시 탭/스페이스 혼용 | VSCode로 파일 열어서 스페이스로 통일 후 저장 |
+
 ---
 
 ## 12. 팀 협업 주의사항
