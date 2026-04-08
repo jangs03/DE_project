@@ -250,7 +250,7 @@ python scrape_tweets.py
 | `No active accounts` | 계정 DB 오류 | `Remove-Item accounts.db` 후 재실행하세요 |
 | `No account available... Next available at` | Rate limit (정상) | 그냥 두면 자동으로 재개됩니다 |
 | `ModuleNotFoundError: twscrape` | 라이브러리 미설치 | `pip install twscrape` 실행하세요 |
-| `Account already exists` (경고) | 정상 동작 | 무시해도 됩니다 > Remove acccount.db를 실행하시면 없어짐. |
+| `Account already exists` (경고) | 정상 동작 | 무시해도 됩니다 > `Remove-Item accounts.db`를 실행하시면 없어짐. |
 
 ---
 
