@@ -251,7 +251,7 @@ python scrape_tweets.py
 | `No account available... Next available at` | Rate limit (정상) | 그냥 두면 자동으로 재개됩니다 |
 | `ModuleNotFoundError: twscrape` | 라이브러리 미설치 | `pip install twscrape` 실행하세요 |
 | `Account already exists` (경고) | 정상 동작 | 무시해도 됩니다 > `Remove-Item accounts.db`를 실행하시면 없어짐. |
-
+|twscrape.accounts_pool:get_for_queue_or_wait:301(308) | 정상 동작 | 잘 동작되고 있는겁니다! 만약 csv 저장이 +0이 계속 뜬다면 그건 다른 오류입니다. 아마 `ondemand.s.js` 오류일 가능성이 큽니다. |
 ---
 
 ## 12. 팀 협업 주의사항
