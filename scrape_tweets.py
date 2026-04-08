@@ -17,15 +17,15 @@ from twscrape.logger import set_log_level
 # ══════════════════════════════════════════════════════════
 #  계정 정보 (직접 입력)
 # ══════════════════════════════════════════════════════════
-X_USERNAME       = "syeon891692"        # 트위터 아이디
-X_PASSWORD       = "dlghkdueowkdtjdus"   # 트위터 비밀번호
-X_EMAIL          = "seoyeonj378@gmail.com"       # 구글 이메일
-X_EMAIL_PASSWORD = "dlghkdueowkdtjdus"     # 구글 비밀번호
+X_USERNAME       = ""        # 트위터 아이디
+X_PASSWORD       = ""   # 트위터 비밀번호
+X_EMAIL          = ""       # 구글 이메일
+X_EMAIL_PASSWORD = ""     # 구글 비밀번호
 
 # 브라우저 쿠키 (Cloudflare 우회용)
 # Chrome → F12 → Application → Cookies → https://x.com
-AUTH_TOKEN = "426b6943cd0a435293a6481a406c36f7753f2812"
-CT0_TOKEN  = "9e193c1de8b4aad8ffeee369f3f59368128b19d4b26b25d28d8455b84a149c315c0b26fd47bf88458d7c0262973d83171ffce6478e2215900c08f8c8db5be6c81714e21c5ee06db41fa64ec5e5bb0b3f"
+AUTH_TOKEN = ""
+CT0_TOKEN  = ""
 
 
 # ══════════════════════════════════════════════════════════
