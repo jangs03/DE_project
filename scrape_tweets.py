@@ -17,15 +17,8 @@ from twscrape.logger import set_log_level
 # ══════════════════════════════════════════════════════════
 #  계정 정보 (직접 입력)
 # ══════════════════════════════════════════════════════════
-X_USERNAME       = ""        # 트위터 아이디
-X_PASSWORD       = ""   # 트위터 비밀번호
-X_EMAIL          = ""       # 구글 이메일
-X_EMAIL_PASSWORD = ""     # 구글 비밀번호
-
 # 브라우저 쿠키 (Cloudflare 우회용)
 # Chrome → F12 → Application → Cookies → https://x.com
-AUTH_TOKEN = ""
-CT0_TOKEN  = ""
 
 
 # ══════════════════════════════════════════════════════════
