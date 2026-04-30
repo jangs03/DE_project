@@ -27,11 +27,11 @@ GALLERY_ID = "mounjaro"
 GALLERY_TYPE = "mgallery"
 BASE_URL = f"https://gall.dcinside.com/{GALLERY_TYPE}/board/lists/?id={GALLERY_ID}"
 
-START_PAGE = 250
+START_PAGE = 1
 END_PAGE = 1900
 
 # 🔽 프록시 없이 쓸 때는 낮춰야 합니다
-CONCURRENCY = 2             # 동시 요청 수 (2~3 권장)
+CONCURRENCY = 4             # 동시 요청 수 (2~3 권장)
 REQUEST_DELAY_MIN = 2.0     # 최소 대기 시간 (초)
 REQUEST_DELAY_MAX = 4.0     # 최대 대기 시간 (초)
 
