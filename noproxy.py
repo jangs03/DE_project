@@ -68,10 +68,7 @@ def get_random_ua() -> str:
 # MongoDB 설정
 # ============================================================
 MONGO_URI = (
-    "mongodb+srv://DEproject1:sksmsskawo123!"
-    "@nje-cluster.mongocluster.cosmos.azure.com/"
-    "?tls=true&authMechanism=SCRAM-SHA-256"
-    "&retrywrites=false&maxIdleTimeMS=120000"
+
 )
 MONGO_DB = "DEproject"
 MONGO_COLLECTION = "dc_test"
