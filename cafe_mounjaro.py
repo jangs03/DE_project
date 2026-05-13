@@ -51,10 +51,7 @@ COOKIE = "NAC=82dcBABYccci; NNB=4HNMVDOAF7BWS; page_uid=jNFoKsqo0qnkYRJzD8s-2323
 # MongoDB 설정
 # ============================================================
 MONGO_URI = (
-    "mongodb+srv://DEproject1:sksmsskawo123!"
-    "@nje-cluster.mongocluster.cosmos.azure.com/"
-    "?tls=true&authMechanism=SCRAM-SHA-256"
-    "&retrywrites=false&maxIdleTimeMS=120000"
+
 )
 MONGO_DB = "DEproject"
 MONGO_COLLECTION = "naver_cafe"
